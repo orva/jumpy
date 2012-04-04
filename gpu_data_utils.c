@@ -9,6 +9,34 @@
 
 
 
+GLuint jpy_create_program(const size_t count, const GLuint* shaders)
+{
+	GLuint program = glCreateProgram();
+
+	for(size_t i=0; i<count; i++) 
+		glAttachShader(program, shaders[i]);
+
+	glLinkProgram(program);
+
+	GLint status;
+	glGetProgramiv(program, GL_LINK_STATUS, &status);
+	if (status == GL_FALSE) {
+		GLint log_length;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
+
+		GLchar *log = malloc(sizeof(GLchar)*(log_length+1));
+		glGetProgramInfoLog(program, log_length, NULL, log);
+		fprintf(stderr, "Linker failure: %s\n", log);
+		free(log);
+	}
+
+	for(size_t i=0; i<count; i++) 
+		glDetachShader(program, shaders[i]);
+
+	return program;
+}
+
+
 GLuint jpy_create_shader(GLenum type, const char* source)
 {
 	GLuint shader = glCreateShader(type);
@@ -41,7 +69,7 @@ GLuint jpy_create_shader(GLenum type, const char* source)
 }
 
 
-GLuint jpy_create_vbo(const int len, const GLfloat* vertices, GLenum type)
+GLuint jpy_create_vbo(const size_t len, const GLfloat* vertices, GLenum type)
 {
 	GLuint vbo;
 

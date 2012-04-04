@@ -4,7 +4,8 @@
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
+GLuint jpy_create_program(const size_t count, const GLuint* shaders);
 GLuint jpy_create_shader(GLenum type, const char* source);
-GLuint jpy_create_vbo(const int len, const GLfloat* vertices, GLenum type);
+GLuint jpy_create_vbo(const size_t len, const GLfloat* vertices, GLenum type);
 
 #endif
