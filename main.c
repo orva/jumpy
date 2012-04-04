@@ -1,3 +1,5 @@
+#include "gpu_data_utils.h"
+
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
@@ -7,6 +9,11 @@
 
 static int running = GL_TRUE;
 
+const GLfloat vertexPositions[] = {
+	0.75f, 0.75f, 0.0f, 1.0f,
+	0.75f, -0.75f, 0.0f, 1.0f,
+	-0.75f, -0.75f, 0.0f, 1.0f,
+};
 
 void jpy_terminate(void)
 {
@@ -17,13 +24,37 @@ void jpy_terminate(void)
 static void GLFWCALL window_resize(int x, int y)
 {
 	glfwSetWindowSize(x,y);
+	glViewport(0, 0, (GLsizei) x, (GLsizei) y);
 }
 
 
 static void main_loop(void)
 {
+	GLuint list[] = {0, 0};
+	list[0] = jpy_read_shader(GL_VERTEX_SHADER, "triangle.vert");
+	list[1] = jpy_read_shader(GL_FRAGMENT_SHADER, "triangle.frag");
+	GLuint program = jpy_create_program(2, list);
+	glDeleteShader(list[0]);
+	glDeleteShader(list[1]);
+
+	GLuint vbo = jpy_create_vbo(12, vertexPositions, GL_STATIC_DRAW);
+
+	GLuint vao;
+       	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
 	while(running) {
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		glUseProgram(program);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		glDisableVertexAttribArray(0);
+		glUseProgram(0);
+
 		glfwSwapBuffers();
 
 		running = !glfwGetKey(GLFW_KEY_ESC) 
@@ -43,6 +74,7 @@ static void init(void)
 	}
 
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3); 
+	glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE); 
 
 	if (!glfwOpenWindow(500, 500, 0,0,0,0, 0,0, GLFW_WINDOW)) {
 		perror("Error while creating window!\n");

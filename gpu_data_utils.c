@@ -3,13 +3,13 @@
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
-#include <stdlib.h>
+
 #include <stdio.h>
+#include <stdlib.h>
 
 
 
-
-GLuint jpy_create_program(const size_t count, const GLuint* shaders)
+GLuint jpy_create_program(const size_t count, const GLuint *shaders)
 {
 	GLuint program = glCreateProgram();
 
@@ -37,7 +37,7 @@ GLuint jpy_create_program(const size_t count, const GLuint* shaders)
 }
 
 
-GLuint jpy_create_shader(GLenum type, const char* source)
+GLuint jpy_create_shader(GLenum type, const char *source)
 {
 	GLuint shader = glCreateShader(type);
 
@@ -50,10 +50,10 @@ GLuint jpy_create_shader(GLenum type, const char* source)
 		GLint log_len;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_len);
 
-		GLchar* log = malloc(sizeof(GLchar)*(log_len+1));
+		GLchar *log = malloc(sizeof(GLchar)*(log_len+1));
 		glGetShaderInfoLog(shader, log_len, NULL, log);
 
-		const char* shader_type = NULL;
+		const char *shader_type = NULL;
 		switch(type) {
 		case GL_VERTEX_SHADER: shader_type = "vertex"; break;
 		case GL_GEOMETRY_SHADER: shader_type = "geometry"; break;
@@ -69,7 +69,31 @@ GLuint jpy_create_shader(GLenum type, const char* source)
 }
 
 
-GLuint jpy_create_vbo(const size_t len, const GLfloat* vertices, GLenum type)
+
+GLuint jpy_read_shader(GLenum type, const char *filename)
+{
+	FILE *fp = fopen(filename, "r");
+	if (!fp)
+		return 0;
+
+	fseek(fp, 0L, SEEK_END);
+	long len = ftell(fp);
+	fseek(fp, 0L, SEEK_SET);
+
+	char *buf = calloc(len+1, sizeof(char));
+	if (!buf)
+		return 0;
+
+	fread(buf, sizeof(char), len, fp);
+	fclose(fp);
+	GLuint shader = jpy_create_shader(type, buf);
+	free(buf);
+
+	return shader;
+}
+
+
+GLuint jpy_create_vbo(const size_t len, const GLfloat vertices[], GLenum type)
 {
 	GLuint vbo;
 
