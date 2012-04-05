@@ -5,14 +5,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 
 static int running = GL_TRUE;
 
 const GLfloat vertexPositions[] = {
-	0.75f, 0.75f, 0.0f, 1.0f,
-	0.75f, -0.75f, 0.0f, 1.0f,
-	-0.75f, -0.75f, 0.0f, 1.0f,
+	0.35f, 0.35f, 0.0f, 1.0f,
+	0.35f, -0.35f, 0.0f, 1.0f,
+	-0.35f, -0.35f, 0.0f, 1.0f,
 };
 
 void jpy_terminate(void)
@@ -28,6 +29,20 @@ static void GLFWCALL window_resize(int x, int y)
 }
 
 
+void ComputePositionOffsets(float *fXOffset, float *fYOffset)
+{
+    const float fLoopDuration = 5.0f;
+    const float fScale = 3.14159f * 2.0f / fLoopDuration;
+    
+    double fElapsedTime = glfwGetTime();
+    
+    float fCurrTimeThroughLoop = fmodf(fElapsedTime, fLoopDuration);
+    
+    *fXOffset = cosf(fCurrTimeThroughLoop * fScale) * 0.5f;
+    *fYOffset = sinf(fCurrTimeThroughLoop * fScale) * 0.5f;
+}
+
+
 static void main_loop(void)
 {
 	GLuint list[] = {0, 0};
@@ -38,15 +53,17 @@ static void main_loop(void)
 	glDeleteShader(list[1]);
 
 	GLuint vbo = jpy_create_vbo(12, vertexPositions, GL_STATIC_DRAW);
+	GLint uni_loc;
 
-	GLuint vao;
-       	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
+	float x_off = 0.0, y_off = 0.0;
 	while(running) {
 		glClear(GL_COLOR_BUFFER_BIT);
-
 		glUseProgram(program);
+
+		ComputePositionOffsets(&x_off, &y_off);
+		uni_loc = glGetUniformLocation(program, "offset");
+		glUniform2f(uni_loc, x_off, y_off);
+
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
@@ -76,7 +93,7 @@ static void init(void)
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3); 
 	glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE); 
 
-	if (!glfwOpenWindow(500, 500, 0,0,0,0, 0,0, GLFW_WINDOW)) {
+	if (!glfwOpenWindow(800, 600, 0,0,0,0, 0,0, GLFW_WINDOW)) {
 		perror("Error while creating window!\n");
 		glfwTerminate();
 		exit(EXIT_FAILURE);

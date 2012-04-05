@@ -8,6 +8,10 @@
 #include <stdlib.h>
 
 
+GLuint stupid_test()
+{
+	return 1;
+}
 
 GLuint jpy_create_program(const size_t count, const GLuint *shaders)
 {

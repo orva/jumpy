@@ -9,4 +9,6 @@ GLuint jpy_create_shader(GLenum type, const char *source);
 GLuint jpy_read_shader(GLenum type, const char *filename);
 GLuint jpy_create_vbo(const size_t len, const GLfloat vertices[], GLenum type);
 
+GLuint stupid_test();
+
 #endif

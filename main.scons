@@ -1,0 +1,24 @@
+flags = Split('-g -Wall -Wextra -pedantic -std=c99 -O')
+test_flags = Split('-Wall -Wextra -pedantic -O')
+lib_path =  Split('/usr/local/lib build')
+cpp_path = Split('/usr/local/include src') 
+
+
+src_files = Glob('src/*.c')
+src_tests = Glob('test/*.cpp')
+
+lib_str = 'GLEW glfw GL X11 pthread rt m'
+libs = Split(lib_str)
+test_libs = Split('GLEW glfw GL X11 pthread rt m jumpy CppUTest')
+
+
+
+env = Environment(CCFLAGS=flags, CPPPATH = cpp_path, LIBS=libs,
+    LIBPATH = lib_path)
+test_env = Environment(CCFLAGS=test_flags, CPPPATH = cpp_path, LIBS=test_libs,
+    LIBPATH = lib_path)
+
+
+prod_lib = env.Library('jumpy', src_files)
+env.Program('jumpy', prod_lib)
+test_env.Program('run_test', src_tests)
