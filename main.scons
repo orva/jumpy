@@ -26,3 +26,5 @@ env.Program('jumpy', prod_lib)
 runner = test_env.Program('run_test', src_tests)
 test_alias = Alias('test', [runner], runner[0].path)
 AlwaysBuild(test_alias)
+
+Default(test_alias)
