@@ -9,7 +9,8 @@ src_tests = Glob('test/*.cpp')
 
 lib_str = 'GLEW glfw GL X11 pthread rt m'
 libs = Split(lib_str)
-test_libs = Split('GLEW glfw GL X11 pthread rt m jumpy CppUTest')
+test_libs_str = lib_str + ' CppUTest jumpy'
+test_libs = Split(test_libs_str)
 
 
 
@@ -21,4 +22,7 @@ test_env = Environment(CCFLAGS=test_flags, CPPPATH = cpp_path, LIBS=test_libs,
 
 prod_lib = env.Library('jumpy', src_files)
 env.Program('jumpy', prod_lib)
-test_env.Program('run_test', src_tests)
+
+runner = test_env.Program('run_test', src_tests)
+test_alias = Alias('test', [runner], runner[0].path)
+AlwaysBuild(test_alias)
