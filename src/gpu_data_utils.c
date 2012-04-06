@@ -1,9 +1,5 @@
 #include "gpu_data_utils.h"
 
-#include <GL/glew.h>
-#include <GL/glfw.h>
-
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,7 +9,7 @@ GLuint stupid_test()
 	return 1;
 }
 
-GLuint jpy_create_program(const size_t count, const GLuint *shaders)
+GLuint jpy_create_program(const size_t count, const jpy_shader shaders[])
 {
 	GLuint program = glCreateProgram();
 
@@ -108,3 +104,4 @@ GLuint jpy_create_vbo(const size_t len, const GLfloat vertices[], GLenum type)
 
 	return vbo;
 }
+
