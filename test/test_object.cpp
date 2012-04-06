@@ -1,15 +1,17 @@
 extern "C"
 {
 	#include "object.h"
-	#include <stdio.h>
-
 }
 
 #include <CppUTest/TestHarness.h>
 
 
-int hidden_counter;
-void draw_f(object *obj)
+/**
+ * These 2 are needed to test draw function apply without actually doing
+ * any rendering. Basicly we are testing if funciton pointers are handled rigth.
+ */
+static int hidden_counter;
+static void draw_f(object *obj)
 {
 	hidden_counter += 1;
 }
@@ -24,7 +26,7 @@ TEST_GROUP(object_test_group)
 	void setup() {
 		vbo = 1;
 		shaders = 2;
-		hidden_counter = 1;
+		hidden_counter = 100;
 		obj = jpy_create_object(vbo, shaders, draw_f);
 	}
 
@@ -34,7 +36,7 @@ TEST_GROUP(object_test_group)
 };
 
 
-TEST(object_test_group, test_create)
+TEST(object_test_group, test_vbo)
 {
 	CHECK(jpy_obj_get_vbo(obj) == vbo);
 }
@@ -46,7 +48,7 @@ TEST(object_test_group, get_shader)
 }
 
 
-TEST(object_test_group, draw_object)
+TEST(object_test_group, test_draw_func)
 {
 	int tmp = hidden_counter;
 	jpy_obj_draw(obj);
