@@ -70,11 +70,11 @@ static void main_loop(void)
 	jpy_shader list[] = {0, 0};
 	list[0] = jpy_read_shader(GL_VERTEX_SHADER, "triangle.vert");
 	list[1] = jpy_read_shader(GL_FRAGMENT_SHADER, "triangle.frag");
-	program = jpy_create_program(2, list);
+	program = jpy_create_program(list);
 	glDeleteShader(list[0]);
 	glDeleteShader(list[1]);
 
-	GLuint vbo = jpy_create_vbo(12, vertexPositions, GL_STATIC_DRAW);
+	GLuint vbo = jpy_create_vbo(vertexPositions, GL_STATIC_DRAW);
 
 	object ob = *jpy_create_object(vbo, 1, draw);
 

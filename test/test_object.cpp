@@ -8,7 +8,7 @@ extern "C"
 
 /**
  * These 2 are needed to test draw function apply without actually doing
- * any rendering. Basicly we are testing if funciton pointers are handled rigth.
+ * any rendering. Basicly we are testing if function pointers are handled rigth.
  */
 static int hidden_counter;
 static void draw_f(object *obj)
