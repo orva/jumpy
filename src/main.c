@@ -1,3 +1,4 @@
+#include "object.h"
 #include "gpu_data_utils.h"
 
 #include <GL/glew.h>
@@ -43,35 +44,47 @@ void ComputePositionOffsets(float *fXOffset, float *fYOffset)
 }
 
 
+static GLuint program; 
+static GLint uni_loc;
+
+void draw(object *obj)
+{
+	float x_off = 0.0, y_off = 0.0;
+	ComputePositionOffsets(&x_off, &y_off);
+	uni_loc = glGetUniformLocation(program, "offset");
+	glUniform2f(uni_loc, x_off, y_off);
+
+
+	jpy_vbo vbo = jpy_obj_get_vbo(obj);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	glDisableVertexAttribArray(0);
+
+}
+
 static void main_loop(void)
 {
-	GLuint list[] = {0, 0};
+	jpy_shader list[] = {0, 0};
 	list[0] = jpy_read_shader(GL_VERTEX_SHADER, "triangle.vert");
 	list[1] = jpy_read_shader(GL_FRAGMENT_SHADER, "triangle.frag");
-	GLuint program = jpy_create_program(2, list);
+	program = jpy_create_program(2, list);
 	glDeleteShader(list[0]);
 	glDeleteShader(list[1]);
 
 	GLuint vbo = jpy_create_vbo(12, vertexPositions, GL_STATIC_DRAW);
-	GLint uni_loc;
 
-	float x_off = 0.0, y_off = 0.0;
+	object ob = *jpy_create_object(vbo, 1, draw);
+
 	while(running) {
 		glClear(GL_COLOR_BUFFER_BIT);
 		glUseProgram(program);
 
-		ComputePositionOffsets(&x_off, &y_off);
-		uni_loc = glGetUniformLocation(program, "offset");
-		glUniform2f(uni_loc, x_off, y_off);
+		jpy_obj_draw(&ob);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		glDisableVertexAttribArray(0);
 		glUseProgram(0);
-
 		glfwSwapBuffers();
 
 		running = !glfwGetKey(GLFW_KEY_ESC) 
