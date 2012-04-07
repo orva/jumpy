@@ -44,14 +44,14 @@ void ComputePositionOffsets(float *fXOffset, float *fYOffset)
 }
 
 
-static GLuint program; 
+static jpy_prog programs[1]; 
 static GLint uni_loc;
 
 void draw(object *obj)
 {
 	float x_off = 0.0, y_off = 0.0;
 	ComputePositionOffsets(&x_off, &y_off);
-	uni_loc = glGetUniformLocation(program, "offset");
+	uni_loc = glGetUniformLocation(programs[0], "offset");
 	glUniform2f(uni_loc, x_off, y_off);
 
 
@@ -70,17 +70,20 @@ static void main_loop(void)
 	jpy_shader list[] = {0, 0};
 	list[0] = jpy_read_shader(GL_VERTEX_SHADER, "triangle.vert");
 	list[1] = jpy_read_shader(GL_FRAGMENT_SHADER, "triangle.frag");
-	program = jpy_create_program(list);
+	programs[0] = jpy_create_program(list);
 	glDeleteShader(list[0]);
 	glDeleteShader(list[1]);
 
+	draw_func funcs[1];
+	funcs[0] = draw;
+
 	GLuint vbo = jpy_create_vbo(vertexPositions, GL_STATIC_DRAW);
 
-	object ob = *jpy_create_object(vbo, 1, draw);
+	object ob = *jpy_obj_create(vbo, programs, funcs, draw);
 
 	while(running) {
 		glClear(GL_COLOR_BUFFER_BIT);
-		glUseProgram(program);
+		glUseProgram(programs[0]);
 
 		jpy_obj_draw(&ob);
 
