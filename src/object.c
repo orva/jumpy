@@ -4,16 +4,22 @@
 
 struct _object {
 	jpy_vbo vbo;
-	jpy_shader shader;
+	jpy_prog program;
 	draw_func draw;
 };
 
 
-object *jpy_create_object(jpy_vbo vbo, jpy_shader shaders, draw_func draw)
+object *jpy_create_object(jpy_vbo vbo, jpy_prog program, draw_func draw)
 {
+	if (draw == NULL)
+		return 0;
+	if (vbo == 0 || program == 0)
+		return 0;
+
+
 	struct _object *obj = malloc(sizeof(object));
 	obj->vbo = vbo;
-	obj->shader = shaders;
+	obj->program = program;
 	obj->draw = draw;
 
 	return (object *)obj;
@@ -41,9 +47,9 @@ jpy_vbo jpy_obj_get_vbo(object *obj)
 }
 
 
-jpy_shader jpy_obj_get_shaders(object *obj)
+jpy_shader jpy_obj_get_program(object *obj)
 {
 	struct _object *tmp = (struct _object *)obj;
-	return tmp->shader;
+	return tmp->program;
 }
 

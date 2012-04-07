@@ -4,15 +4,14 @@
 #include <GL/glew.h>
 #include <GL/glfw.h>
 
-typedef GLfloat jpy_vbo;
-typedef GLfloat jpy_shader;
+typedef GLuint jpy_vbo;
+typedef GLuint jpy_shader;
+typedef GLuint jpy_prog;
 
-GLuint jpy_create_program(const jpy_shader shaders[]);
-GLuint jpy_create_shader(GLenum type, const char *source);
-GLuint jpy_read_shader(GLenum type, const char *filename);
-GLuint jpy_create_vbo(const GLfloat vertices[], GLenum type);
-
-GLuint stupid_test();
+jpy_prog jpy_create_program(const jpy_shader shaders[]);
+jpy_shader jpy_create_shader(GLenum type, const char *source);
+jpy_shader jpy_read_shader(GLenum type, const char *filename);
+jpy_vbo jpy_create_vbo(const GLfloat vertices[], GLenum type);
 
 #endif
 

@@ -20,14 +20,15 @@ static void draw_f(object *obj)
 TEST_GROUP(object_test_group)
 {
 	jpy_vbo vbo;
-	jpy_shader shaders;
+	jpy_prog programs[2];
 	object *obj;
 
 	void setup() {
 		vbo = 1;
-		shaders = 2;
+		programs[0] = 2;
+		programs[1] = 3;
 		hidden_counter = 100;
-		obj = jpy_create_object(vbo, shaders, draw_f);
+		obj = jpy_create_object(vbo, programs[0], draw_f);
 	}
 
 	void teardown() {
@@ -36,17 +37,23 @@ TEST_GROUP(object_test_group)
 };
 
 
+
+TEST(object_test_group, test_create)
+{
+	CHECK(jpy_create_object(0, programs[0], draw_f) == 0);
+	CHECK(jpy_create_object(vbo, 0, draw_f) == 0);
+	CHECK(jpy_create_object(vbo, programs[0], NULL) == 0);
+}
+
 TEST(object_test_group, test_vbo)
 {
 	CHECK(jpy_obj_get_vbo(obj) == vbo);
 }
 
-
-TEST(object_test_group, get_shader)
+TEST(object_test_group, get_program)
 {
-	CHECK(jpy_obj_get_shaders(obj) == shaders);
+	CHECK(jpy_obj_get_program(obj) == programs[0]);
 }
-
 
 TEST(object_test_group, test_draw_func)
 {

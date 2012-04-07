@@ -4,14 +4,10 @@
 #include <stdlib.h>
 
 
-GLuint stupid_test()
-{
-	return 1;
-}
 
-GLuint jpy_create_program(const jpy_shader shaders[])
+jpy_prog jpy_create_program(const jpy_shader shaders[])
 {
-	GLuint program = glCreateProgram();
+	jpy_prog program = glCreateProgram();
 
 	for(size_t i=0; i<sizeof shaders; i++) 
 		glAttachShader(program, shaders[i]);
@@ -37,7 +33,7 @@ GLuint jpy_create_program(const jpy_shader shaders[])
 }
 
 
-GLuint jpy_create_shader(GLenum type, const char *source)
+jpy_shader jpy_create_shader(GLenum type, const char *source)
 {
 	GLuint shader = glCreateShader(type);
 
@@ -70,7 +66,7 @@ GLuint jpy_create_shader(GLenum type, const char *source)
 
 
 
-GLuint jpy_read_shader(GLenum type, const char *filename)
+jpy_shader jpy_read_shader(GLenum type, const char *filename)
 {
 	FILE *fp = fopen(filename, "r");
 	if (!fp)
@@ -93,7 +89,7 @@ GLuint jpy_read_shader(GLenum type, const char *filename)
 }
 
 
-GLuint jpy_create_vbo(const GLfloat vertices[], GLenum type)
+jpy_vbo jpy_create_vbo(const GLfloat vertices[], GLenum type)
 {
 	GLuint vbo;
 
