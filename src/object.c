@@ -47,7 +47,7 @@ jpy_vbo jpy_obj_get_vbo(object *obj)
 }
 
 
-jpy_shader jpy_obj_get_program(object *obj)
+jpy_prog jpy_obj_get_program(object *obj)
 {
 	struct _object *tmp = (struct _object *)obj;
 	return tmp->program;

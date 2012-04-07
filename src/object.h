@@ -13,7 +13,7 @@ void jpy_delete_object(object *obj);
 void jpy_obj_draw(object *obj);
 
 jpy_vbo jpy_obj_get_vbo(object *obj);
-jpy_shader jpy_obj_get_program(object *obj);
+jpy_prog jpy_obj_get_program(object *obj);
 
 #endif
 
