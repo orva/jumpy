@@ -17,7 +17,7 @@ object *jpy_obj_create(jpy_vbo vbo, jpy_prog programs[], draw_func funcs[],
 		draw_func draw)
 {
 	if (vbo == 0 || programs == NULL || draw == NULL)
-		return 0;
+		return NULL;
 
 
 	struct _object *obj = malloc(sizeof(struct _object));
