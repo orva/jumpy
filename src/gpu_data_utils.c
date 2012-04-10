@@ -62,7 +62,6 @@ jpy_shader jpy_create_shader(GLenum type, const char *source)
 		free(log);
 	}
 
-	printf("Shader id: %u", shader);
 	return shader;
 }
 

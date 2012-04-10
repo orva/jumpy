@@ -24,6 +24,25 @@ static void draw(object *obj)
 	if (!program)
 		return;
 
+	glUseProgram(program);
+
+	jpy_vbo vbo = jpy_obj_get_vbo(obj);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	glDisableVertexAttribArray(0);
+	glUseProgram(0);
+}
+
+
+static void move(object *obj)
+{
+	jpy_prog program = jpy_obj_get_program(obj, 1);
+	if (!program)
+		return;
+
 	float x_off = 0.0, y_off = 0.0;
 	compute_offsets(&x_off, &y_off);
 
@@ -40,6 +59,7 @@ static void draw(object *obj)
 
 	glDisableVertexAttribArray(0);
 	glUseProgram(0);
+
 }
 
 
@@ -53,16 +73,20 @@ object *create_triangle(void)
 
 
 	jpy_vbo vbo = jpy_create_vbo(p, 12, GL_STREAM_DRAW);
-	jpy_prog programs[1];
+	jpy_prog programs[2];
 
-	jpy_shader shaders[2] = {
-		jpy_read_shader(GL_VERTEX_SHADER, "data/triangle.vert"),
-		jpy_read_shader(GL_FRAGMENT_SHADER, "data/triangle.frag")
-	};
+	jpy_shader shaders[2];
+	shaders[0] = jpy_read_shader(GL_VERTEX_SHADER, "data/triangle_static.vert");
+	shaders[1] = jpy_read_shader(GL_FRAGMENT_SHADER, "data/triangle.frag");
 	programs[0] = jpy_create_program(shaders);
 
+	shaders[0] = jpy_read_shader(GL_VERTEX_SHADER, "data/triangle_moving.vert");
+	shaders[1] = jpy_read_shader(GL_FRAGMENT_SHADER, "data/triangle.frag");
+	programs[1] = jpy_create_program(shaders);
 
-	object *o = jpy_obj_create(vbo, programs, NULL, draw);
+
+	draw_func funcs[] = {move};
+	object *o = jpy_obj_create(vbo, programs, funcs, draw);
 	if (!o) {
 		perror("Creating triangle failed!");
 		exit(EXIT_FAILURE);

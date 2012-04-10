@@ -27,6 +27,28 @@ static void GLFWCALL window_resize(int x, int y)
 }
 
 
+static int moving = GL_FALSE;
+static void GLFWCALL key_callback(int key, int action)
+{
+	switch(key) {
+	case GLFW_KEY_ESC:
+		if (action == GLFW_RELEASE)
+			jpy_terminate();
+		break;
+	case GLFW_KEY_SPACE:
+		if (action == GLFW_RELEASE)
+			moving = moving ? GL_FALSE : GL_TRUE;
+		break;
+	}
+}
+
+
+static int GLFWCALL close_callback(void)
+{
+	jpy_terminate();
+	return GL_TRUE;
+}
+
 
 static void main_loop(void)
 {
@@ -35,12 +57,12 @@ static void main_loop(void)
 	while(running) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		jpy_obj_draw(tri);
+		if (!moving)
+			jpy_obj_draw(tri);
+		else
+			jpy_obj_invoke(tri, 0);
 
 		glfwSwapBuffers();
-
-		running = !glfwGetKey(GLFW_KEY_ESC) 
-			&& glfwGetWindowParam(GLFW_OPENED);
 
 		if (!running)
 			jpy_terminate();
@@ -71,8 +93,11 @@ static void init(void)
 		exit(EXIT_FAILURE);
 	}
 
-	glfwSetWindowSizeCallback(window_resize);
 	glClearColor(0.0234,0.5937,0.6015,0);
+
+	glfwSetWindowSizeCallback(window_resize);
+	glfwSetKeyCallback(key_callback);
+	glfwSetWindowCloseCallback(close_callback);
 }
 
 
