@@ -11,6 +11,7 @@
 #include <math.h>
 
 
+
 static FTGLfont *font;
 static long last_frame;
 static int frames,
@@ -19,15 +20,19 @@ static int running = GL_TRUE;
 static int width = 800,
 	   height = 600;
 
-void jpy_terminate(void)
+static int moving = GL_FALSE; // This should be in some object state thing..
+
+
+void jpy_terminate(int exit_val)
 {
 	glfwTerminate();
 	ftglDestroyFont(font);
-	exit(EXIT_SUCCESS);
+	exit(exit_val);
 }
 
 
-static void GLFWCALL window_resize(int x, int y)
+
+static void GLFWCALL window_resize_callback(int x, int y)
 {
 	glfwSetWindowSize(x,y);
 	glViewport(0, 0, (GLsizei) x, (GLsizei) y);
@@ -36,13 +41,12 @@ static void GLFWCALL window_resize(int x, int y)
 }
 
 
-static int moving = GL_FALSE;
 static void GLFWCALL key_callback(int key, int action)
 {
 	switch(key) {
 	case GLFW_KEY_ESC:
 		if (action == GLFW_RELEASE)
-			jpy_terminate();
+			jpy_terminate(EXIT_SUCCESS);
 		break;
 	case GLFW_KEY_SPACE:
 		if (action == GLFW_RELEASE)
@@ -54,7 +58,7 @@ static void GLFWCALL key_callback(int key, int action)
 
 static int GLFWCALL close_callback(void)
 {
-	jpy_terminate();
+	jpy_terminate(EXIT_SUCCESS);
 	return GL_TRUE;
 }
 
@@ -82,7 +86,7 @@ static void print(const char str[])
 static void calculate_fps(void)
 {
 	long cur = glfwGetTime();
-	char buf[32];
+	char buf[32]; // TODO make this safe.
 	if (cur > last_frame) {
 		fps = frames;
 		frames = 0;
@@ -114,7 +118,7 @@ static void main_loop(void)
 		glfwSwapBuffers();
 
 		if (!running)
-			jpy_terminate();
+			jpy_terminate(EXIT_SUCCESS);
 	}
 }
 
@@ -129,11 +133,14 @@ static void init(void)
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3); 
 	glfwOpenWindowHint(GLFW_WINDOW_NO_RESIZE, GL_TRUE); 
 
-	if (!glfwOpenWindow(800, 600, 0,0,0,0, 0,0, GLFW_WINDOW)) {
+	if (!glfwOpenWindow(width, height, 0,0,0,0, 0,0, GLFW_WINDOW)) {
 		perror("Error while creating window!\n");
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
+	glfwSetWindowSizeCallback(window_resize_callback);
+	glfwSetKeyCallback(key_callback);
+	glfwSetWindowCloseCallback(close_callback);
 
 	// Get all non-ancient gl* functions.
 	if (glewInit() != GLEW_OK) {
@@ -144,15 +151,13 @@ static void init(void)
 
 	glClearColor(0.0234,0.5937,0.6015,0);
 
-	glfwSetWindowSizeCallback(window_resize);
-	glfwSetKeyCallback(key_callback);
-	glfwSetWindowCloseCallback(close_callback);
+	font = ftglCreatePixmapFont("data/VeraMono.ttf");
+	ftglSetFontFaceSize(font, 12, 12);
 
+	// FPS counter variables.
 	frames = 0;
 	fps = 0;
 	last_frame = glfwGetTime();
-	font = ftglCreatePixmapFont("data/VeraMono.ttf");
-	ftglSetFontFaceSize(font, 12, 12);
 }
 
 
@@ -162,6 +167,6 @@ int main(void)
 	main_loop();
 
 	perror("Reached end of main, this should not happen!\n");
-	return EXIT_SUCCESS;
+	return EXIT_FAILURE;
 }
 
