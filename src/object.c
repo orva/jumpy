@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 struct _object {
 	size_t prog_count;
@@ -25,12 +26,12 @@ object *jpy_obj_create(jpy_vbo vbo, jpy_prog programs[], draw_func funcs[],
 
 	obj->programs = malloc(sizeof programs);
 	memcpy(obj->programs, programs, sizeof programs);
-	obj->prog_count = sizeof programs;
+	obj->prog_count = sizeof programs/sizeof *programs;
 
 	if (funcs) {
 		obj->funcs = malloc(sizeof funcs);
 		memcpy(obj->funcs, funcs, sizeof programs);
-		obj->func_count = sizeof funcs;
+		obj->func_count = sizeof funcs/sizeof *funcs;
 	} else {
 		obj->funcs = NULL;
 		obj->func_count = 0;
@@ -64,7 +65,8 @@ void jpy_obj_draw(object *obj)
 		return;
 
 	struct _object *tmp = (struct _object *)obj;
-	tmp->draw(obj);
+	draw_func fun = tmp->draw;
+	fun(obj);
 }
 
 
@@ -84,7 +86,7 @@ jpy_prog jpy_obj_get_program(object *obj, size_t id)
 		return 0;
 
 	struct _object *tmp = (struct _object *)obj;
-	if (id >= tmp->prog_count || id < 0)
+	if (id >= tmp->prog_count)
 		return 0;
 
 	return tmp->programs[id];
@@ -97,7 +99,7 @@ int jpy_obj_invoke(object *obj, size_t id)
 		return 0;
 
 	struct _object *tmp = (struct _object *)obj;
-	if (id >= tmp->func_count || id < 0)
+	if (id >= tmp->func_count)
 		return 0;
 
 	draw_func fun = tmp->funcs[id];

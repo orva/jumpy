@@ -9,7 +9,8 @@ jpy_prog jpy_create_program(const jpy_shader shaders[])
 {
 	jpy_prog program = glCreateProgram();
 
-	for(size_t i=0; i<sizeof shaders; i++) 
+	size_t size = sizeof shaders/sizeof *shaders;
+	for(size_t i=0; i<size; i++) 
 		glAttachShader(program, shaders[i]);
 
 	glLinkProgram(program);
@@ -26,7 +27,7 @@ jpy_prog jpy_create_program(const jpy_shader shaders[])
 		free(log);
 	}
 
-	for(size_t i=0; i<sizeof shaders; i++) 
+	for(size_t i=0; i<size; i++) 
 		glDetachShader(program, shaders[i]);
 
 	return program;
@@ -61,6 +62,7 @@ jpy_shader jpy_create_shader(GLenum type, const char *source)
 		free(log);
 	}
 
+	printf("Shader id: %u", shader);
 	return shader;
 }
 
@@ -89,13 +91,13 @@ jpy_shader jpy_read_shader(GLenum type, const char *filename)
 }
 
 
-jpy_vbo jpy_create_vbo(const GLfloat vertices[], GLenum type)
+jpy_vbo jpy_create_vbo(const float vertices[], size_t count, GLenum type)
 {
-	GLuint vbo;
+	jpy_vbo vbo;
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof vertices, vertices, type);
+	glBufferData(GL_ARRAY_BUFFER, count*sizeof vertices[0], vertices, type);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return vbo;

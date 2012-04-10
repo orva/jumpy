@@ -1,4 +1,4 @@
-#include "examples/triangle.h"
+#include "triangle.h"
 #include "object.h"
 #include "gpu_data_utils.h"
 
@@ -30,13 +30,12 @@ static void GLFWCALL window_resize(int x, int y)
 
 static void main_loop(void)
 {
-	object tri = *create_triangle();
+	object *tri = create_triangle();
 
 	while(running) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//jpy_obj_draw(&ob);
-		jpy_obj_draw(&tri);
+		jpy_obj_draw(tri);
 
 		glfwSwapBuffers();
 
