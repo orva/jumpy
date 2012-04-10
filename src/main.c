@@ -4,18 +4,25 @@
 
 #include <GL/glew.h>
 #include <GL/glfw.h>
+#include <FTGL/ftgl.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 
 
+static FTGLfont *font;
+static long last_frame;
+static int frames,
+	   fps;
 static int running = GL_TRUE;
-
+static int width = 800,
+	   height = 600;
 
 void jpy_terminate(void)
 {
 	glfwTerminate();
+	ftglDestroyFont(font);
 	exit(EXIT_SUCCESS);
 }
 
@@ -24,6 +31,8 @@ static void GLFWCALL window_resize(int x, int y)
 {
 	glfwSetWindowSize(x,y);
 	glViewport(0, 0, (GLsizei) x, (GLsizei) y);
+	width = x;
+	height = y;
 }
 
 
@@ -50,6 +59,44 @@ static int GLFWCALL close_callback(void)
 }
 
 
+static void print(const char str[])
+{
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0.0,0.0 + width,0,0.0 + height,-1.0, 1.0);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	glRasterPos2f(10.0f, 0.0f+height-20.0f);
+
+	ftglRenderFont(font, str, FTGL_RENDER_ALL);
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();   
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
+
+static void calculate_fps(void)
+{
+	long cur = glfwGetTime();
+	char buf[32];
+	if (cur > last_frame) {
+		fps = frames;
+		frames = 0;
+		last_frame = cur;
+		sprintf(buf, "fps : %d", fps);
+		print(buf);
+	} else {
+		frames += 1;
+		sprintf(buf, "fps : %d", fps);
+		print(buf);
+	}
+}
+
+
 static void main_loop(void)
 {
 	object *tri = create_triangle();
@@ -62,6 +109,8 @@ static void main_loop(void)
 		else
 			jpy_obj_invoke(tri, 0);
 
+
+		calculate_fps();
 		glfwSwapBuffers();
 
 		if (!running)
@@ -98,6 +147,12 @@ static void init(void)
 	glfwSetWindowSizeCallback(window_resize);
 	glfwSetKeyCallback(key_callback);
 	glfwSetWindowCloseCallback(close_callback);
+
+	frames = 0;
+	fps = 0;
+	last_frame = glfwGetTime();
+	font = ftglCreatePixmapFont("data/VeraMono.ttf");
+	ftglSetFontFaceSize(font, 12, 12);
 }
 
 

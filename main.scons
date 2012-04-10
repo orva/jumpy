@@ -1,13 +1,13 @@
 flags = Split('-g -Wall -Wextra -pedantic -std=c99 -O')
 test_flags = Split('-Wall -Wextra -pedantic -O')
-lib_path =  Split('/usr/local/lib build')
-cpp_path = Split('/usr/local/include src') 
+lib_path =  Split('/usr/local/lib /usr/lib build')
+cpp_path = Split('/usr/local/include /usr/include/freetype2 src') 
 
 
 src_files = Glob('src/*.c')
 src_tests = Glob('test/*.cpp')
 
-lib_str = 'GLEW glfw GL X11 pthread rt m'
+lib_str = 'GLEW glfw GL X11 pthread rt m ftgl'
 libs = Split(lib_str)
 test_libs_str = lib_str + ' CppUTest jumpy'
 test_libs = Split(test_libs_str)

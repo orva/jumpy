@@ -9,5 +9,6 @@ you can do graphic stuff with pure C.
 * CppUTest - http://www.cpputest.org/
 * GLFW - http://www.glfw.org/
 * GLEW - http://glew.sourceforge.net/
+* FTGL - http://sourceforge.net/projects/ftgl/
 
 
